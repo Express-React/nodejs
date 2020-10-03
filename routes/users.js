@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var devices = require('../utilities/users');
+var users = require('../utilities/users');
 let jwt = require('jsonwebtoken');
 let config = require('../config');
 let middleware = require('../middleware');
@@ -10,16 +10,16 @@ router.use(bodyParser.json());
 
 //============ Add new device ====================//
 router.post("/add/", middleware.checkToken , function(req, res) {
-    devices.add(req.body.name, req.body.password, req.body.uuid, function(result){
+    users.add(req.body.name, req.body.password, req.body.uuid, function(result){
         res.json({
             success : true,
             response: 'success',
         });
     });
 });
-//============ get all devices ====================//
+//============ get all users ====================//
 router.get(  "/list/", middleware.checkToken , function(req, res) {
-    devices.list( function(result) {
+    users.list( function(result) {
         res.json({
             success : true,
             "response": "success",
@@ -28,22 +28,22 @@ router.get(  "/list/", middleware.checkToken , function(req, res) {
         res.end();
     });
 });
-//============ update the bot details ====================//
+//============ update the Users details ====================//
 router.post("/update/", middleware.checkToken , function(req, res) {
-    devices.update(req, function(result) {
+    users.update(req, function(result) {
         res.json({
             success : true,
-            "response": "Bot updated succesfully"
+            "response": "Users updated succesfully"
         });
         res.end();
     });
 });
 
-//============ login to  the bot ====================//
+//============ login to  the Users ====================//
 router.post("/login/", function(req, res) {
     var message ="error";
     var token = ""
-    devices.login( req, function(data, result){
+    users.login( req, function(data, result){
         if(result == "success"){
              token = jwt.sign({name: req.body.name},
                 config.secret, { expiresIn: config.jwtExpiry });
@@ -67,20 +67,20 @@ router.post("/login/", function(req, res) {
 router.post("/signin/", function(req, res) {
     var message ="error";
     var token = ""
-    devices.signin( req, function(data, result){
+    users.signin( req, function(data, result){
         if(result == "success"){
             passport.compareHash(req.body.password, 
                 data.password,
                     function(result){
                 if(result){
                     token = jwt.sign({name: req.body.name},
-                        config.secret, { expiresIn: '24h' });
+                        config.secret, { expiresIn: config.jwtExpiry });
                     message = "success";
                     let resData = {
                         "name":data['name'],'id':data['id'],
                         'last_login':data['last_login'],'status':data['status']
                     }
-                    devices.updateLogin(req.body.name, function(){})
+                    users.updateLogin(req.body.name, function(){})
                     res.send({
                         token : token,
                         response: message,
@@ -99,7 +99,7 @@ router.post("/signin/", function(req, res) {
 });
 router.post('/signup/',  function (req, res) {
 
-    devices.signin( req, function(data, result){
+    users.signin( req, function(data, result){
         if(result == "success"){
             res.statusCode = 409
             res.send({
@@ -109,7 +109,7 @@ router.post('/signup/',  function (req, res) {
         } else{
             
             passport.generateHash(req.body.password, function(hash){
-                devices.add(req.body.name, hash, function(result){
+                users.add(req.body.name, hash, function(result){
                     res.statusCode = 201
                     res.send({
                         success : true,
@@ -123,21 +123,21 @@ router.post('/signup/',  function (req, res) {
    
 });
 
-router.post("/delete/", middleware.checkToken , function(req, res) {
-    devices.remove(req.body, function(result) {
+router.delete("/delete/", middleware.checkToken , function(req, res) {
+    users.remove(req.body, function(result) {
         res.json({
             success : true,
-            "response": "Bot updated succesfully"
+            "response": result
         });
         res.end();
     });
     router.post("/auth/", function(req, res) {
         var message ="error";
         var token = ""
-        devices.login( req, function(data, result){
+        users.login( req, function(data, result){
             if(result == "success"){
                  token = jwt.sign({name: req.body.name},
-                    config.secret, { expiresIn: '24h' });
+                    config.secret, { expiresIn: config.jwtExpiry });
                 message = "success";
                 res.send({
                     data: {

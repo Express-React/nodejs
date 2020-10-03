@@ -1,21 +1,20 @@
 /**
- * Devices api
+ * Users api
  */
 var table = require('./db');
 
 module.exports = {
-    //login deviceslop
     login : function( req, responseCallback){
   
         table.User.find({
             where: {
                 name: req.body.name, password:  req.body.password
             }
-            }).then(function(device) {
-            if (!device) 
+            }).then(function(users) {
+            if (!users) 
                 responseCallback("","error");
             else{
-                let data  = {"name":device['name'],"id":device['id']}
+                let data  = {"name":users['name'],"id":users['id']}
                 responseCallback(data, "success");
             }
                 
@@ -28,11 +27,11 @@ module.exports = {
             where: {
                 name: req.body.name
             }
-            }).then(function(device) {
-            if (!device) 
+            }).then(function(users) {
+            if (!users) 
                 responseCallback("","error");
             else
-                responseCallback(device, "success");
+                responseCallback(users, "success");
         });
     },
     
@@ -42,11 +41,11 @@ module.exports = {
             where: {
                 name: req.body.name, password:  req.body.password
             }
-            }).then(function(device) {
-            if (!device) 
+            }).then(function(users) {
+            if (!users) 
                 responseCallback("","error");
             else
-                responseCallback(device, "success");
+                responseCallback(users, "success");
         });
     },
 
@@ -61,16 +60,18 @@ module.exports = {
     },
 
     list:  function(responseCallback){
-        table.User.findAll().then((data) => {
+        table.User.findAll({
+            attributes: ['id', 'name','status','last_login'],
+        }).then((data) => {
             responseCallback(data)
           });
     },
  
-    update:  function(oDevice, responseCallback){
-        table.User.update( { name: oDevice["body"]["name"], 
-            password: oDevice["body"]["password"], 
-            uuid: oDevice["body"]["uuid"] }, 
-            { where: {id:  oDevice["body"]["id"]} }
+    update:  function(oUsers , responseCallback){
+        table.User.update( { name: oUsers ["body"]["name"], 
+            password: oUsers ["body"]["password"], 
+             }, 
+            { where: {id:  oUsers ["body"]["id"]} }
           ).then(() => {
             responseCallback(("success"))
           });        
@@ -87,8 +88,12 @@ module.exports = {
     remove : function(req, responseCallback){
         table.User.destroy({
             where: { id: req.id }
-        }).then(() => {
-            responseCallback('deleted successfully a customer  ');
+        }).then((err, res) => {
+            let str="deleted successfully"
+            if(err != "1"){
+                str = 'Requested data not found';
+            }
+            responseCallback(str);
         });
     } 
 }

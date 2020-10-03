@@ -6,7 +6,7 @@ var passport   = require('passport');
 var session    = require('express-session');
 var appRoute = require('./routes/main.js');
 const helmet = require('helmet');
-const port = 3000;
+const port = 3001;
 app.use(helmet.frameguard({ action: 'sameorigin' }));
 
 // Instantiating the app 
