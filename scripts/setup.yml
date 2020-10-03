@@ -1,0 +1,118 @@
+---
+- hosts: all
+  become_method: sudo
+  become: yes
+  gather_facts: True
+
+  vars:
+    ssh_key: "{{ home }}/.ssh/id_rsa"
+    user: ubuntu
+    home: "/home/{{ user }}"
+    project_name: "nodejs"
+    project_root: "{{ home }}/{{ project_name }}"
+    local_project_root: "{{ playbook_dir | dirname }}"
+    server_name: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
+    pm2_service : server.js
+    pm2_stop : "pm2 stop {{pm2_service}}"
+    pm2_start : "pm2 start {{pm2_service}}"
+    db_name : "mitron"
+    db_user : "root"
+    db_password : "password"
+
+  tasks:
+  - name: Install Packages
+    apt: name={{ item }} state=present
+    with_items:
+        - build-essential
+        - nodejs-legacy
+        - npm
+        - git
+        - mcrypt
+        - nginx
+        - curl
+        - python3-pip
+        - libmysqlclient-dev
+        - python3-dev
+        - python3-mysqldb
+
+  - name: Install MySQL
+    action: apt pkg={{item}} state=installed
+    with_items:
+        - mysql-client-core-5.7
+
+        - name: Install MySQL
+        hosts: mysql-service
+        tasks:
+          - name: Install MySQL
+            action: $ansible_pkg_mgr pkg=mysql-server state=installed
+          - name: Add Python MySQL DB
+            action: $ansible_pkg_mgr pkg=python-mysqldb state=installed
+      
+      
+      - name: Configure MySQL
+        hosts: mysql-service
+        tasks:
+          - name: Configure my.cnf
+            copy: src=/files/my.cnf
+                  dest=/etc/mysql/my.cnf
+                  owner=root
+                  group=root
+                  mode=0640
+            notify:
+              - restart mysql
+          
+          - name: Add mysql-user
+            mysql_user: name=mysql_service
+                        password=12345
+                        priv=*.*:ALL
+                        state=present
+            notify:
+              - start mysql
+      
+        handlers:
+          - name: start mysql
+            service: name=mysql
+                     enabled=yes
+                     state=started
+          - name: restart mysql
+            service: name=mysql
+                     enabled=yes
+                     state=restarted      
+  
+  - name: Creating database
+    mysql_db:
+      login_unix_socket: /var/run/mysqld/mysqld.sock
+      name: "{{ db_name }}"
+      state: present 
+
+
+  - name: Create db User
+    mysql_user:
+        name: "{{db_user}}"
+        password: "{{db_password}}"
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+  
+
+  - name: Install pm2
+    npm: name=pm2 global=yes production=yes
+
+  - name: get variables
+    debug: var=hostvars
+
+
+  - name: Stop application
+    command: "chdir={{project_root}} {{pm2_stop}} --name nodeapp"
+
+  - name: rsync project to target host
+    synchronize:
+      src: "{{ local_project_root }}"
+      dest: "{{ home }}"
+      rsync_opts:
+        - "--delete"
+
+  - name: Update npm
+    npm:
+      path={{ project_root }}
+
+  - name: Start application
+    command: "chdir={{project_root}} {{pm2_start}} --name nodeapp"

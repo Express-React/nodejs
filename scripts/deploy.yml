@@ -1,0 +1,45 @@
+---
+- hosts: all
+  become_method: sudo
+  become: yes
+  gather_facts: False
+
+  vars:
+    ssh_key: "{{ home }}/.ssh/id_rsa"
+    user: ubuntu
+    home: "/home/{{ user }}"
+    project_name: "nodejs"
+    project_root: "{{ home }}/{{ project_name }}"
+    local_project_root: "{{ playbook_dir | dirname }}"
+    local_ssh_key: /home/chillaranand/.ssh/id_rsa
+    server_name: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
+    pm2_service : server.js
+    pm2_stop : "pm2 stop {{pm2_service}}"
+    pm2_start : "pm2 start {{pm2_service}}"
+
+  tasks:
+    - debug:
+        msg: "{{ server_name }}"
+
+    - name: get variables
+      debug: var=hostvars
+
+    - name: update apt cache
+      apt: update_cache=yes cache_valid_time=3600
+
+    - name: Stop application
+      command: "chdir={{project_root}} {{pm2_stop}} --name nodeapp"
+
+    - name: rsync project to target host
+      synchronize:
+        src: "{{ local_project_root }}"
+        dest: "{{ home }}"
+        rsync_opts:
+          - "--delete"
+
+    - name: Update npm
+      npm:
+        path={{ project_root }}
+
+    - name: Start application
+      command: "chdir={{project_root}} {{pm2_start}} --name nodeapp"
