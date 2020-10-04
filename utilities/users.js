@@ -4,13 +4,13 @@
 var table = require('./db');
 
 module.exports = {
-    login : function( req, responseCallback){
+    login : ( req, responseCallback) => {
   
         table.User.find({
             where: {
                 name: req.body.name, password:  req.body.password
             }
-            }).then(function(users) {
+            }).then((users)  => {
             if (!users) 
                 responseCallback("","error");
             else{
@@ -21,13 +21,13 @@ module.exports = {
         });
     },
 
-    signin : function( req, responseCallback){
+    signin : ( req, responseCallback)  => {
   
-        table.User.find({
+        table.User.findOne({
             where: {
                 name: req.body.name
             }
-            }).then(function(users) {
+            }).then((users)  => {
             if (!users) 
                 responseCallback("","error");
             else
@@ -35,13 +35,13 @@ module.exports = {
         });
     },
     
-    newUser : function( req, responseCallback){
+    newUser : ( req, responseCallback) =>{
   
         table.User.find({
             where: {
                 name: req.body.name, password:  req.body.password
             }
-            }).then(function(users) {
+            }).then((users)  => {
             if (!users) 
                 responseCallback("","error");
             else
@@ -49,7 +49,7 @@ module.exports = {
         });
     },
 
-    add:  function( name, password, responseCallback){
+    add:  ( name, password, responseCallback) => {
         table.User.create( { name: name, 
             password: password, last_login : new Date()
         })
@@ -59,7 +59,7 @@ module.exports = {
           
     },
 
-    list:  function(responseCallback){
+    list:  (responseCallback)  => {
         table.User.findAll({
             attributes: ['id', 'name','status','last_login'],
         }).then((data) => {
@@ -67,7 +67,7 @@ module.exports = {
           });
     },
  
-    update:  function(oUsers , responseCallback){
+    update:  (oUsers , responseCallback)  =>{
         table.User.update( { name: oUsers ["body"]["name"], 
             password: oUsers ["body"]["password"], 
              }, 
@@ -76,7 +76,7 @@ module.exports = {
             responseCallback(("success"))
           });        
     },
-    updateLogin:  function(name, responseCallback){
+    updateLogin:  (name, responseCallback) => {
         table.User.update( { 
             last_login : new Date() }, 
             { where: {name:  name} }
@@ -85,7 +85,7 @@ module.exports = {
           });        
     },
 
-    remove : function(req, responseCallback){
+    remove : (req, responseCallback) => {
         table.User.destroy({
             where: { id: req.id }
         }).then((err, res) => {

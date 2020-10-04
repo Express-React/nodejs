@@ -9,7 +9,7 @@ var bodyParser = require('body-parser');
 router.use(bodyParser.json());
 
 //============ Add new device ====================//
-router.post("/add/", middleware.checkToken , function(req, res) {
+router.post("/add/", middleware.checkToken , (req, res) => {
     users.add(req.body.name, req.body.password, req.body.uuid, function(result){
         res.json({
             success : true,
@@ -18,7 +18,7 @@ router.post("/add/", middleware.checkToken , function(req, res) {
     });
 });
 //============ get all users ====================//
-router.get(  "/list/", middleware.checkToken , function(req, res) {
+router.get(  "/list/", middleware.checkToken , (req, res) => {
     users.list( function(result) {
         res.json({
             success : true,
@@ -29,8 +29,8 @@ router.get(  "/list/", middleware.checkToken , function(req, res) {
     });
 });
 //============ update the Users details ====================//
-router.post("/update/", middleware.checkToken , function(req, res) {
-    users.update(req, function(result) {
+router.post("/update/", middleware.checkToken , (req, res) => {
+    users.update(req, (result) => {
         res.json({
             success : true,
             "response": "Users updated succesfully"
@@ -40,10 +40,10 @@ router.post("/update/", middleware.checkToken , function(req, res) {
 });
 
 //============ login to  the Users ====================//
-router.post("/login/", function(req, res) {
+router.post("/login/", (req, res) => {
     var message ="error";
     var token = ""
-    users.login( req, function(data, result){
+    users.login( req, (data, result) => {
         if(result == "success"){
              token = jwt.sign({name: req.body.name},
                 config.secret, { expiresIn: config.jwtExpiry });
@@ -64,14 +64,14 @@ router.post("/login/", function(req, res) {
         }
     })
 });
-router.post("/signin/", function(req, res) {
+router.post("/signin/", (req, res) => {
     var message ="error";
     var token = ""
-    users.signin( req, function(data, result){
+    users.signin( req, (data, result) => {
         if(result == "success"){
             passport.compareHash(req.body.password, 
                 data.password,
-                    function(result){
+                    (result) => {
                 if(result){
                     token = jwt.sign({name: req.body.name},
                         config.secret, { expiresIn: config.jwtExpiry });
@@ -80,7 +80,7 @@ router.post("/signin/", function(req, res) {
                         "name":data['name'],'id':data['id'],
                         'last_login':data['last_login'],'status':data['status']
                     }
-                    users.updateLogin(req.body.name, function(){})
+                    users.updateLogin(req.body.name, () => {})
                     res.send({
                         token : token,
                         response: message,
@@ -97,9 +97,9 @@ router.post("/signin/", function(req, res) {
         } 
     })
 });
-router.post('/signup/',  function (req, res) {
+router.post('/signup/',   (req, res) => {
 
-    users.signin( req, function(data, result){
+    users.signin( req, (data, result)=>{
         if(result == "success"){
             res.statusCode = 409
             res.send({
@@ -108,8 +108,8 @@ router.post('/signup/',  function (req, res) {
             });
         } else{
             
-            passport.generateHash(req.body.password, function(hash){
-                users.add(req.body.name, hash, function(result){
+            passport.generateHash(req.body.password, (hash) => {
+                users.add(req.body.name, hash, (result) => {
                     res.statusCode = 201
                     res.send({
                         success : true,
@@ -123,18 +123,18 @@ router.post('/signup/',  function (req, res) {
    
 });
 
-router.delete("/delete/", middleware.checkToken , function(req, res) {
-    users.remove(req.body, function(result) {
+router.delete("/delete/", middleware.checkToken , (req, res)  => {
+    users.remove(req.body, (result)  => {
         res.json({
             success : true,
             "response": result
         });
         res.end();
     });
-    router.post("/auth/", function(req, res) {
+    router.post("/auth/", (req, res)  => {
         var message ="error";
         var token = ""
-        users.login( req, function(data, result){
+        users.login( req, (data, result)  => {
             if(result == "success"){
                  token = jwt.sign({name: req.body.name},
                     config.secret, { expiresIn: config.jwtExpiry });

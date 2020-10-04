@@ -4,16 +4,16 @@ const saltRounds = 10;
 
 module.exports  = { 
 
-    generateHash :  function(password, callback) {
-        bcrypt.genSalt(saltRounds, function(err, salt) {
-            bcrypt.hash(password, salt, function(err, hash) {
+    generateHash :  (password, callback) => {
+        bcrypt.genSalt(saltRounds, (err, salt) => {
+            bcrypt.hash(password, salt, (err, hash) => {
                 callback(hash);
             });
         });
     },
 
-    compareHash :  function(password, hash, callback){
-        bcrypt.compare(password , hash).then(function(result) {
+    compareHash :  (password, hash, callback) => {
+        bcrypt.compare(password , hash).then((result) => {
             callback(result);
         });
     }
