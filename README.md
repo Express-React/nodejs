@@ -95,9 +95,8 @@ Seed the database with the dummy data
 curl --location --request POST 'http://localhost:3001/flight/seed/' \
 --header 'Authorization: Bearer {{TOKEN}}' \
 ```
-<video class='featured wide' controls width='1080px' height='608px' preload='auto'
-  onclick='(function(el){ if(el.paused) el.play(); else el.pause() })(this)'>
+<video class='featured wide' controls >
 
-  <source src='/nodejs.mp4' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+  <source src='nodejs.mp4' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
   
 </video>
