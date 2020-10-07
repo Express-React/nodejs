@@ -9,8 +9,38 @@
 		 <br>Sign Up check for duplicate user
 		 <br>Sign In get the JWT token
  7. Logger through `winston`.
-		 
+	 
 ---
+
+# Running your App
+
+## Load Env
+
+```
+mv sample_env .env # rename the file name
+```
+ENV details
+```
+NODE_ENV=development
+PORT=3001
+SECRET=343037e3-1b3e-11ea-97d1-787b8aabf786
+DEV=true
+DB_NAME=flight
+DB_USER=root
+HOST=localhost
+DB_PASS=password
+```
+## Installation
+
+```
+npm install 
+nodemon server.js
+```
+
+Logs everything in the logs folder, creates `combined.log` and `error.log`
+
+---
+
 # API Details
 
 ## Sign Up New user
@@ -59,3 +89,16 @@ Failure Response
 "message": "Incorrect username or password"
 }
 ```
+
+Seed the database with the dummy data
+```
+curl --location --request POST 'http://localhost:3001/flight/seed/' \
+--header 'Authorization: Bearer {{TOKEN}}' \
+```
+<video class='featured wide' controls width='1080px' height='608px' preload='auto'
+  onclick='(function(el){ if(el.paused) el.play(); else el.pause() })(this)'>
+  
+  <source src='/Nodejs.webm' type='video/webm; codecs="vp8, vorbis"'>
+
+  
+</video>

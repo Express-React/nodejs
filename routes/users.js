@@ -9,7 +9,7 @@ var bodyParser = require('body-parser');
 router.use(bodyParser.json());
 
 //============ Add new device ====================//
-router.post("/add/", middleware.checkToken , (req, res) => {
+router.post("/", middleware.checkToken , (req, res) => {
     users.add(req.body.name, req.body.password, req.body.uuid, function(result){
         res.json({
             success : true,
@@ -18,7 +18,7 @@ router.post("/add/", middleware.checkToken , (req, res) => {
     });
 });
 //============ get all users ====================//
-router.get(  "/list/", middleware.checkToken , (req, res) => {
+router.get("/", middleware.checkToken , (req, res) => {
     users.list( function(result) {
         res.json({
             success : true,
@@ -29,7 +29,7 @@ router.get(  "/list/", middleware.checkToken , (req, res) => {
     });
 });
 //============ update the Users details ====================//
-router.post("/update/", middleware.checkToken , (req, res) => {
+router.put("/", middleware.checkToken , (req, res) => {
     users.update(req, (result) => {
         res.json({
             success : true,
@@ -94,7 +94,12 @@ router.post("/signin/", (req, res) => {
                       });
                 }
             })
-        } 
+        } else{
+            res.send({
+                success : false,
+                message: 'Incorrect username or password'
+              });
+        }
     })
 });
 router.post('/signup/',   (req, res) => {
@@ -123,7 +128,7 @@ router.post('/signup/',   (req, res) => {
    
 });
 
-router.delete("/delete/", middleware.checkToken , (req, res)  => {
+router.delete("/", middleware.checkToken , (req, res)  => {
     users.remove(req.body, (result)  => {
         res.json({
             success : true,
@@ -131,30 +136,30 @@ router.delete("/delete/", middleware.checkToken , (req, res)  => {
         });
         res.end();
     });
-    router.post("/auth/", (req, res)  => {
-        var message ="error";
-        var token = ""
-        users.login( req, (data, result)  => {
-            if(result == "success"){
-                 token = jwt.sign({name: req.body.name},
-                    config.secret, { expiresIn: config.jwtExpiry });
-                message = "success";
-                res.send({
-                    data: {
-                        token : token,
-                        response: message,
-                        data: data,
-                        success : true
-                    }
+router.post("/auth/", (req, res)  => {
+    var message ="error";
+    var token = ""
+    users.login( req, (data, result)  => {
+        if(result == "success"){
+                token = jwt.sign({name: req.body.name},
+                config.secret, { expiresIn: config.jwtExpiry });
+            message = "success";
+            res.send({
+                data: {
+                    token : token,
+                    response: message,
+                    data: data,
+                    success : true
+                }
+            });
+        } else if (result == "error"){
+            res.send({
+                success : false,
+                message: 'Incorrect username or password'
                 });
-            } else if (result == "error"){
-                res.send({
-                    success : false,
-                    message: 'Incorrect username or password'
-                  });
-            }
-        })
-    });
+        }
+    })
+});
     
 });
 module.exports = router;
