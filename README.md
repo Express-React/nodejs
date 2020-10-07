@@ -97,8 +97,7 @@ curl --location --request POST 'http://localhost:3001/flight/seed/' \
 ```
 <video class='featured wide' controls width='1080px' height='608px' preload='auto'
   onclick='(function(el){ if(el.paused) el.play(); else el.pause() })(this)'>
-  
-  <source src='Nodejs.webm' type='video/webm; codecs="vp8, vorbis"'>
 
+  <source src='/nodejs.mp4' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
   
 </video>
