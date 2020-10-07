@@ -27,13 +27,34 @@ class Logger {
         this.logFormat
       ),
       transports: [
-        new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-        new winston.transports.File({ filename: 'logs/combined.log' })
+        new winston.transports.Console({
+          level: 'trace',
+          prettyPrint: true,
+          colorize: true,
+          silent: false,
+          timestamp: true
+        }),
+        new winston.transports.File({ 
+          filename: 'logs/error.log', 
+          level: 'error' }),
+        new winston.transports.File({ 
+          filename: 'logs/combined.log',
+          handleExceptions: true,
+          json: true,
+          meta: true,
+          msg: "HTTP {{req.method}} {{req.url}}",
+          maxsize: 5242880, //5MB
+          maxFiles: 5,
+          expressFormat: true,
+          colorize: true
+        })
+        
       ]
     });
   }
 }
 
 const logger = new Logger();
+
 
 module.exports = logger;

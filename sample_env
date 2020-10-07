@@ -1,0 +1,8 @@
+NODE_ENV=development
+PORT=3001
+SECRET=343037e3-1b3e-11ea-97d1-787b8aabf786
+DEV=true
+DB_NAME=flight
+DB_USER=root
+HOST=localhost
+DB_PASS=password

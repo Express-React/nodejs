@@ -4,6 +4,9 @@ var flight = require('../utilities/flight');
 let config = require('../config');
 let middleware = require('../middleware');
 var bodyParser = require('body-parser');
+const fs = require('fs');
+let flight_json = fs.readFileSync('./seed/flights.json');
+
 router.use(bodyParser.json());
 
 
@@ -38,7 +41,7 @@ router.delete("/", middleware.checkToken , (req, res) => {
 });
 
 
-router.delete("/delete_all", middleware.checkToken , (req, res) => {
+router.delete("/all", middleware.checkToken , (req, res) => {
     flight.destroy( {});
     res.json({
         success : true,
@@ -47,11 +50,12 @@ router.delete("/delete_all", middleware.checkToken , (req, res) => {
 });
 
 
-router.post("/bulk/add/", middleware.checkToken , (req, res) => {
-
-    for(let k=0;k<req.body.data.length;k++){
+router.post("/seed/", middleware.checkToken , (req, res) => {
+    
+    let  json_data = JSON.parse(flight_json);
+    for(let k=0;k<json_data.length;k++){
         
-        flight.add(req.body.data[k], (result) => {
+        flight.add(json_data[k], (result) => {
             console.log(result)     
         });
     }

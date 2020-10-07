@@ -11,6 +11,7 @@
     "download-file": "^0.1.5",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
+    "express-winston": "^4.0.5",
     "formidable": "^1.1.1",
     "helmet": "^3.21.2",
     "jsonwebtoken": "^8.5.1",
